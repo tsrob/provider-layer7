@@ -108,7 +108,6 @@ if ($FixStateSummary) {
     if ($OutFile) { $out | Out-File -FilePath $OutFile -Encoding UTF8 } else { Write-Output $out }
     exit 0
 }
-}
 
 # JSON format: enforce CSAF 2.0 schema
 if ($Format -eq 'json') {
@@ -172,11 +171,18 @@ if ($Format -eq 'csv') {
             @('threat_severity','public_date')
         }
         foreach ($field in $fieldsToShow) {
-            $value = $item
-            foreach ($part in $field -split '\.') { $value = $value.$part }
-            $output += "  $field`: $value"
-        }
-        if ($IncludeUrls) {
+    if ($field -eq 'package_state') {
+    # Expand each package state entry with full schema fields
+    foreach ($state in $item.package_state) {
+        $output += "  package_state: product_name=$($state.product_name), fix_state=$($state.fix_state), package_name=$($state.package_name), cpe=$($state.cpe)"
+    }
+} else {
+        $value = $item
+        foreach ($part in $field -split '\.') { $value = $value.$part }
+        $output += "  $field`: $value"
+    }
+}
+if ($IncludeUrls) {
             foreach ($bz in $item.bugzilla) { $output += "  URL: $($bz.url)" }
         }
     }
