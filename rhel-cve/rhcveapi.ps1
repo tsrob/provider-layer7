@@ -50,7 +50,48 @@ param(
     [Alias('of')]                       [string] $OutFile
 )
 
-function Get-CveData { param($Url) Invoke-RestMethod -Uri $Url -ErrorAction Stop }
+function Get-CveData {
+    param([string] $Url)
+    $maxRetries = 2
+    $attempt    = 0
+    while ($true) {
+        try {
+            return Invoke-RestMethod -Uri $Url -ErrorAction Stop
+        } catch {
+            $resp = $_.Exception.Response
+            if ($resp -and $resp.StatusCode.value__ -eq 404) {
+                $attempt++
+                if ($attempt -le $maxRetries) {
+                    Write-Warning "404 Not Found for $Url, retrying in 5 seconds (attempt $attempt of $maxRetries)..."
+                    Start-Sleep -Seconds 5
+                    continue
+                } else {
+                    $id = [IO.Path]::GetFileNameWithoutExtension($Url)
+                    return [ordered]@{
+                        name             = $id
+                        threat_severity  = 'not found'
+                        public_date      = ''
+                        bugzilla         = @()
+                        cvss3            = [ordered]@{ cvss3_base_score=''; cvss3_scoring_vector=''; status='' }
+                        cwe              = ''
+                        details          = @()
+                        statement        = ''
+                        affected_release = @()
+                        package_state    = @()
+                        references       = @()
+                        mitigation       = [ordered]@{ value=''; lang='' }
+                        csaw             = $false
+                    }
+                }
+            } elseif ($resp -and $resp.StatusCode.value__ -ge 500) {
+                Throw "Server error ($($resp.StatusCode.value__)) fetching $Url"
+            } else {
+                Write-Error "Failed to fetch $Url"
+                return $null
+            }
+        }
+    }
+}
 
 # Collect IDs or search
 $ids = @()
@@ -155,7 +196,7 @@ if ($Format -eq 'json') {
 # CSV and Plain
 if ($Format -eq 'csv') {
     $header = 'CVE,ThreatSeverity,PublicDate'
-    $rows   = $items | ForEach-Object { "{0},{1},{2}" -f $_.CVE, $_.threat_severity, $_.public_date }
+    $rows   = $items | ForEach-Object { "{0},{1},{2}" -f $_.name, $_.threat_severity, $_.public_date }
     $output = $header + "`n" + ($rows -join "`n")
 } else {
     $output = @()
