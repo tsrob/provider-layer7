@@ -105,6 +105,15 @@ if ($doSearch) {
     $q = @(); foreach ($p in @{before=$QBefore;after=$QAfter;bug=$QBug;advisory=$QAdvisory;severity=$QSeverity;product=$QProduct;package=$QPackage;cwe=$QCwe;cvss=$QCvss;cvss3=$QCvss3;empty=($QEmpty.IsPresent);pagesize=$QPageSize;pagenum=$QPageNum;raw=$QRaw}) {
         if ($p.Value) { $q += "${p.Key}=${p.Value}" }
     }
+        # Handle multiple products for search filter
+    if ($QProduct) {
+        # Remove any single product entry if present
+        $q = $q | Where-Object { -not ($_ -like 'product=*') }
+        # Add each product filter separately
+        foreach ($prod in $QProduct) {
+            $q += "product=$prod"
+        }
+    }
     $items = Get-CveData "https://access.redhat.com/hydra/rest/securitydata/cve?" + ($q -join '&')
     if ($items -isnot [System.Array]) { $items = @($items) }
 } elseif ($ids) {
@@ -115,24 +124,22 @@ if ($doSearch) {
 
 # Fix-State-Summary
 if ($FixStateSummary) {
+    $productFilters = if ($QProduct) { $QProduct -split ',' | ForEach-Object { $_.Trim() } } else { @() }
     if ($Format -eq 'csv') {
-        # CSV header includes PackageName and Mitigation
         $lines = @('CVE,Severity,Date,ProductName,PackageName,FixState,Mitigation')
         foreach ($item in $items) {
             foreach ($state in $item.package_state) {
-                if (-not $QProduct -or $state.product_name -match $QProduct) {
-                    $mit = ($item.mitigation.value -replace "[
-]+", ' ') -replace ',', ';'
+                if (-not $QProduct -or ($productFilters -contains $state.product_name)) {
+                    $mit = ($item.mitigation.value -replace "[\r\n]+", ' ') -replace ',', ';'
                     $lines += "$($item.name),$($item.threat_severity),$($item.public_date),$($state.product_name),$($state.package_name),$($state.fix_state),$mit"
                 }
             }
         }
         $out = $lines -join "`n"
     } else {
-        # Plain table includes PackageName and Mitigation
         $table = foreach ($item in $items) {
             foreach ($state in $item.package_state) {
-                if (-not $QProduct -or $state.product_name -match $QProduct) {
+                if (-not $QProduct -or ($productFilters -contains $state.product_name)) {
                     [PSCustomObject]@{
                         CVE         = $item.name
                         Severity    = $item.threat_severity
