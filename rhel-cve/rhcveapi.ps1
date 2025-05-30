@@ -121,7 +121,8 @@ if ($FixStateSummary) {
         foreach ($item in $items) {
             foreach ($state in $item.package_state) {
                 if (-not $QProduct -or $state.product_name -match $QProduct) {
-                    $mit = $item.mitigation.value -replace ',', ';'
+                    $mit = ($item.mitigation.value -replace "[
+]+", ' ') -replace ',', ';'
                     $lines += "$($item.name),$($item.threat_severity),$($item.public_date),$($state.product_name),$($state.package_name),$($state.fix_state),$mit"
                 }
             }
