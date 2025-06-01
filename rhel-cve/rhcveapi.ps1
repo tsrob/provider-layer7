@@ -105,14 +105,9 @@ if ($doSearch) {
     $q = @(); foreach ($p in @{before=$QBefore;after=$QAfter;bug=$QBug;advisory=$QAdvisory;severity=$QSeverity;product=$QProduct;package=$QPackage;cwe=$QCwe;cvss=$QCvss;cvss3=$QCvss3;empty=($QEmpty.IsPresent);pagesize=$QPageSize;pagenum=$QPageNum;raw=$QRaw}) {
         if ($p.Value) { $q += "${p.Key}=${p.Value}" }
     }
-        # Handle multiple products for search filter
     if ($QProduct) {
-        # Remove any single product entry if present
         $q = $q | Where-Object { -not ($_ -like 'product=*') }
-        # Add each product filter separately
-        foreach ($prod in $QProduct) {
-            $q += "product=$prod"
-        }
+        foreach ($prod in $QProduct) { $q += "product=$prod" }
     }
     $items = Get-CveData "https://access.redhat.com/hydra/rest/securitydata/cve?" + ($q -join '&')
     if ($items -isnot [System.Array]) { $items = @($items) }
@@ -126,12 +121,13 @@ if ($doSearch) {
 if ($FixStateSummary) {
     $productFilters = if ($QProduct) { $QProduct -split ',' | ForEach-Object { $_.Trim() } } else { @() }
     if ($Format -eq 'csv') {
-        $lines = @('CVE,Severity,Date,ProductName,PackageName,FixState,Mitigation')
+        $lines = @('CVE,Severity,Date,ProductName,PackageName,FixState,Mitigation,CWE')
         foreach ($item in $items) {
             foreach ($state in $item.package_state) {
                 if (-not $QProduct -or ($productFilters -contains $state.product_name)) {
                     $mit = ($item.mitigation.value -replace "[\r\n]+", ' ') -replace ',', ';'
-                    $lines += "$($item.name),$($item.threat_severity),$($item.public_date),$($state.product_name),$($state.package_name),$($state.fix_state),$mit"
+                    $cweVal = if ($item.cwe) { $item.cwe } else { 'N/A' }
+                    $lines += "$($item.name),$($item.threat_severity),$($item.public_date),$($state.product_name),$($state.package_name),$($state.fix_state),$mit,$cweVal"
                 }
             }
         }
@@ -148,6 +144,7 @@ if ($FixStateSummary) {
                         PackageName = $state.package_name
                         FixState    = $state.fix_state
                         Mitigation  = $item.mitigation.value
+                        CWE         = $item.cwe
                     }
                 }
             }
@@ -203,13 +200,15 @@ if ($Format -eq 'json') {
 
 # CSV and Plain
 if ($Format -eq 'csv') {
-    $header = 'CVE,ThreatSeverity,PublicDate'
-    $rows   = $items | ForEach-Object { "{0},{1},{2}" -f $_.name, $_.threat_severity, $_.public_date }
+    $header = 'CVE,ThreatSeverity,PublicDate,CWE'
+    $rows   = $items | ForEach-Object { "{0},{1},{2},{3}" -f $_.name, $_.threat_severity, $_.public_date, ($_.cwe -replace ',', ';') }
     $output = $header + "`n" + ($rows -join "`n")
 } else {
     $output = @()
     foreach ($item in $items) {
         $output += $item.name
+        # Always include CWE in plain output
+        $output += "  CWE: $($item.cwe)"
         $fieldsToShow = if ($AllFields) {
             $item.PSObject.Properties.Name
         } elseif ($MostFields) {
@@ -220,18 +219,17 @@ if ($Format -eq 'csv') {
             @('threat_severity','public_date')
         }
         foreach ($field in $fieldsToShow) {
-    if ($field -eq 'package_state') {
-    # Expand each package state entry with full schema fields
-    foreach ($state in $item.package_state) {
-        $output += "  package_state: product_name=$($state.product_name), fix_state=$($state.fix_state), package_name=$($state.package_name), cpe=$($state.cpe)"
-    }
-} else {
-        $value = $item
-        foreach ($part in $field -split '\.') { $value = $value.$part }
-        $output += "  $field`: $value"
-    }
-}
-if ($IncludeUrls) {
+            if ($field -eq 'package_state') {
+                foreach ($state in $item.package_state) {
+                    $output += "  package_state: product_name=$($state.product_name), fix_state=$($state.fix_state), package_name=$($state.package_name), cpe=$($state.cpe)"
+                }
+            } else {
+                $value = $item
+                foreach ($part in $field -split '\.') { $value = $value.$part }
+                $output += "  $field`: $value"
+            }
+        }
+        if ($IncludeUrls) {
             foreach ($bz in $item.bugzilla) { $output += "  URL: $($bz.url)" }
         }
     }
