@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI for Financial IT Teams - Visual Slide Deck</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .slideshow-container {
+            position: relative;
+            max-width: 100%;
+            height: 100vh;
+        }
+
+        .slide {
+            display: none;
+            padding: 20px;
+            text-align: center;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            box-sizing: border-box;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .slide h1 {
+            font-size: 2.2em;
+            margin-bottom: 15px;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-top: 10px;
+        }
+
+        .slide h2 {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            color: #4CAF50;
+        }
+
+        .slide h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #87CEEB;
+        }
+
+        .slide h4 {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: #FFD700;
+        }
+
+        .slide p, .slide li {
+            font-size: 0.95em;
+            line-height: 1.4;
+            margin-bottom: 8px;
+            text-align: left;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 700px;
+            height: 280px;
+            margin: 10px auto;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            flex-shrink: 0;
+        }
+
+        .diagram-container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px auto;
+            max-width: 1000px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .architecture-diagram {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .component {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            min-width: 120px;
+            text-align: center;
+            transition: transform 0.3s;
+            font-size: 0.9em;
+        }
+
+        .component:hover {
+            transform: translateY(-5px);
+        }
+
+        .arrow {
+            font-size: 1.5em;
+            color: #FFD700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+            max-height: 300px;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #FFD700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.95em;
+            color: #87CEEB;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 1em;
+        }
+
+        .scipab-framework {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .scipab-item {
+            background: linear-gradient(135deg, #FF6B6B, #ee5a52);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        .scipab-letter {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #FFD700;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .roadmap {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            max-height: 400px;
+        }
+
+        .phase {
+            background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+            padding: 15px;
+            border-radius: 15px;
+            width: 280px;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+
+        .phase-number {
+            font-size: 1.8em;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .timeline {
+            color: #87CEEB;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .training-path {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+            max-height: 350px;
+        }
+
+        .training-level {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 5px solid #4CAF50;
+            font-size: 0.9em;
+        }
+
+        .security-layers {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 15px 0;
+        }
+
+        .security-layer {
+            background: linear-gradient(90deg, #FF9800, #F57C00);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 3px 0;
+            position: relative;
+            font-size: 0.9em;
+        }
+
+        .example-box {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4CAF50;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .warning-box {
+            background: rgba(255, 152, 0, 0.2);
+            border: 2px solid #FF9800;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .info-box {
+            background: rgba(33, 150, 243, 0.2);
+            border: 2px solid #2196F3;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide.active {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .content-list {
+            text-align: left;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .content-list ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .content-list li {
+            background: rgba(255,255,255,0.1);
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="slideshow-container">
+        <div class="logo">AI Financial Services</div>
+        <div class="slide-counter">
+            <span id="currentSlide">1</span> / <span id="totalSlides">32</span>
+        </div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <h1>🤖 AI (Artificial Intelligence) for Financial IT Teams</h1>
+            <h2>Strategic Implementation and Career Readiness</h2>
+            <div class="diagram-container">
+                <div style="font-size: 3em; margin: 20px 0;">
+                    💼🏦🔧⚡
+                </div>
+                <p style="text-align: center; font-size: 1.2em; color: #87CEEB;">
+                    A Comprehensive Guide to AI Adoption in Financial Services
+                </p>
+                <p style="text-align: center; font-size: 1em; margin-top: 20px;">
+                    Presentation for IT Teams | 2025
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Executive Summary -->
+        <div class="slide">
+            <h1>📊 Executive Summary - The AI Reality Check</h1>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">78%</span>
+                    <span class="stat-label">Financial Organizations Using AI</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">65%</span>
+                    <span class="stat-label">Regularly Using GenAI (Generative AI)</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">4.2x</span>
+                    <span class="stat-label">ROI (Return on Investment) for Financial AI</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">29%</span>
+                    <span class="stat-label">Annual Growth Rate</span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="adoptionChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Slide 3: What is AI -->
+        <div class="slide">
+            <h1>🧠 What is AI? - Technical Definition</h1>
+            <div class="diagram-container">
+                <h3>AI System Components</h3>
+                <div class="architecture-diagram">
+                    <div class="component">📊 Data Input</div>
+                    <div class="arrow">→</div>
+                    <div class="component">🔄 Statistical Processing</div>
+                    <div class="arrow">→</div>
+                    <div class="component">📈 Pattern Recognition</div>
+                    <div class="arrow">→</div>
+                    <div class="component">🎯 Prediction/Output</div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <h3>Key Characteristics for IT Teams:</h3>
+                    <ul style="font-size: 1em; color: #87CEEB; columns: 2;">
+                        <li>📊 Data-driven processing through mathematical algorithms</li>
+                        <li>📈 Statistical pattern recognition operating on probability distributions</li>
+                        <li>💻 Resource-intensive operations requiring specialized hardware (GPUs/TPUs)</li>
+                        <li>☁️ Scalable, cloud-native architectures for distributed processing</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: ANI - Artificial Narrow Intelligence -->
+        <div class="slide">
+            <h1>🎯 ANI (Artificial Narrow Intelligence) - Current Reality</h1>
+            <div class="diagram-container">
+                <div class="two-column">
+                    <div>
+                        <h3>Definition & Characteristics</h3>
+                        <div class="info-box">
+                            <p><strong>ANI:</strong> AI systems designed for specific, single-purpose tasks</p>
+                            <p><strong>Current Status:</strong> All existing AI systems are ANI</p>
+                            <p><strong>Performance:</strong> Often exceeds human capability in narrow domains</p>
+                        </div>
+                        <h4>Technical Implementation:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>✅ Easier integration with existing systems</li>
+                                <li>💾 Lower computational requirements</li>
+                                <li>🔄 Well-understood deployment patterns</li>
+                                <li>⚡ Faster development and testing cycles</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Real-World Financial Examples</h3>
+                        <div class="example-box">
+                            <h4>🏦 JPMorgan Chase - COIN Platform</h4>
+                            <p><strong>Purpose:</strong> Contract Intelligence for legal document analysis</p>
+                            <p><strong>Impact:</strong> Saves 360,000 work hours annually</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>🛡️ Mastercard - Decision Intelligence</h4>
+                            <p><strong>Purpose:</strong> Real-time fraud detection</p>
+                            <p><strong>Impact:</strong> Reduces fraud by 50% in some regions</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>💹 Goldman Sachs - Marcus</h4>
+                            <p><strong>Purpose:</strong> Algorithmic trading and risk assessment</p>
+                            <p><strong>Impact:</strong> Processes millions of transactions daily</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: GenAI - Generative Artificial Intelligence -->
+        <div class="slide">
+            <h1>🎨 GenAI (Generative Artificial Intelligence) - Strategic Priority</h1>
+            <div class="diagram-container">
+                <div class="two-column">
+                    <div>
+                        <h3>Definition & Capabilities</h3>
+                        <div class="info-box">
+                            <p><strong>GenAI:</strong> AI that creates new content (text, code, images, documents)</p>
+                            <p><strong>Technology:</strong> Based on transformer neural networks</p>
+                            <p><strong>Market Growth:</strong> $1.67B (2023) → $16.02B (2030)</p>
+                        </div>
+                        <h4>Infrastructure Requirements:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>🖥️ High-memory GPU (Graphics Processing Unit) clusters</li>
+                                <li>🔄 Robust API (Application Programming Interface) management</li>
+                                <li>🛡️ Content filtering and safety systems</li>
+                                <li>📊 Vector databases for RAG (Retrieval-Augmented Generation)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Financial Services Applications</h3>
+                        <div class="example-box">
+                            <h4>📋 Document Generation</h4>
+                            <p><strong>Use Case:</strong> Compliance reports, client communications</p>
+                            <p><strong>Tools:</strong> GPT-4, Claude, Gemini</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>💻 Code Generation</h4>
+                            <p><strong>Use Case:</strong> API development, testing scripts</p>
+                            <p><strong>Tools:</strong> GitHub Copilot, Amazon CodeWhisperer</p>
+                        </div>
+                        <div class="example-box">
+                            <h4>📊 Data Analysis</h4>
+                            <p><strong>Use Case:</strong> Risk assessment reports, market analysis</p>
+                            <p><strong>Impact:</strong> 30% faster report generation</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: AGI - Artificial General Intelligence -->
+        <div class="slide">
+            <h1>🧠 AGI (Artificial General Intelligence) - Future Vision</h1>
+            <div class="diagram-container">
+                <div class="two-column">
+                    <div>
+                        <h3>Definition & Timeline</h3>
+                        <div class="warning-box">
+                            <p><strong>AGI:</strong> Hypothetical AI with human-level cognitive abilities across all domains</p>
+                            <p><strong>Status:</strong> Currently theoretical and under research</p>
+                            <p><strong>Expert Timeline:</strong> 5-20 years to several decades</p>
+                        </div>
+                        <h4>Potential Capabilities:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>🎯 Multi-domain problem solving</li>
+                                <li>🔄 Learning and adapting across different tasks</li>
+                                <li>💡 Creative reasoning and innovation</li>
+                                <li>🤝 Natural human-like interaction</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Strategic IT Planning Considerations</h3>
+                        <div class="info-box">
+                            <h4>Current Approach</h4>
+                            <p>Focus infrastructure investments on ANI and GenAI implementations while maintaining scalability for future AGI developments</p>
+                        </div>
+                        <h4>Infrastructure Implications:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>📈 Massive computational requirements</li>
+                                <li>🔧 Flexible, scalable architecture design</li>
+                                <li>🛡️ Enhanced security and governance frameworks</li>
+                                <li>👥 Significant organizational change management</li>
+                            </ul>
+                        </div>
+                        <div class="warning-box">
+                            <p><strong>IT Strategy:</strong> Plan for ANI/GenAI dominance while monitoring AGI research and preparing adaptable infrastructure</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Types of AI Overview -->
+        <div class="slide">
+            <h1>🎯 Types of AI - Comparison Overview</h1>
+            <div class="stats-grid">
+                <div class="stat-card" style="background: linear-gradient(135deg, #4CAF50, #45a049);">
+                    <h3>ANI</h3>
+                    <p>Current Reality<br/>Single-purpose systems</p>
+                    <p style="font-size: 0.8em;">✅ Easier integration<br/>✅ Lower compute requirements</p>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #9C27B0, #7B1FA2);">
+                    <h3>GenAI</h3>
+                    <p>Strategic Priority<br/>Content creation</p>
+                    <p style="font-size: 0.8em;">🚀 Current deployment<br/>💾 High-memory GPU clusters</p>
+                </div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #FF9800, #F57C00);">
+                    <h3>AGI</h3>
+                    <p>Future Vision<br/>Human-level performance</p>
+                    <p style="font-size: 0.8em;">⏳ Currently theoretical<br/>🔮 Plan for scalability</p>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="aiTypesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Slide 8: AI Technical Architecture Overview -->
+        <div class="slide">
+            <h1>🏗️ AI Technical Architecture - Core Components</h1>
+            <div class="diagram-container">
+                <div class="architecture-diagram" style="flex-direction: column; gap: 20px;">
+                    <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                        <div class="component">🧠 LLMs (Large Language Models)<br/><small>Neural Networks</small></div>
+                        <div class="component">🤖 AI Agents<br/><small>Autonomous Systems</small></div>
+                        <div class="component">🎼 Orchestrators<br/><small>Workflow Management</small></div>
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                        <div class="component">🔌 MCP (Model Context Protocol) Servers<br/><small>Universal Connectivity</small></div>
+                        <div class="component">📊 Vector DBs (Databases)<br/><small>Semantic Search</small></div>
+                        <div class="component">🎫 Tokens<br/><small>Processing Units</small></div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; font-size: 0.9em; color: #87CEEB;">
+                    <strong>2024-2025 Breakthrough:</strong> Model Context Protocol (MCP) adopted by OpenAI with 5,000+ active servers
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: How GenAI Works - Probability Engine -->
+        <div class="slide">
+            <h1>⚡ How Current GenAI Works - Probability Engine</h1>
+            <div class="diagram-container">
+                <h3>Token Prediction Process</h3>
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <div style="font-family: monospace; font-size: 1.2em; color: #FFD700;">
+                        P(token_n | token_1, token_2, ..., token_{n-1})
+                    </div>
+                    <p style="text-align: center; margin-top: 10px;">Probability of next token given previous sequence</p>
+                </div>
+                <div class="architecture-diagram" style="flex-direction: column;">
+                    <div class="component">📝 Input Tokenization</div>
+                    <div class="arrow">↓</div>
+                    <div class="component">🔄 Context Loading</div>
+                    <div class="arrow">↓</div>
+                    <div class="component">🧮 Attention Computation</div>
+                    <div class="arrow">↓</div>
+                    <div class="component">📊 Probability Distribution</div>
+                    <div class="arrow">↓</div>
+                    <div class="component">🎯 Token Selection</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Training Example -->
+        <div class="slide">
+            <h1>📚 Simple LLM Training Example</h1>
+            <div class="diagram-container">
+                <h3>Teaching Financial Knowledge</h3>
+                <div style="background: rgba(76, 175, 80, 0.2); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <h4 style="color: #4CAF50;">Input Training Data:</h4>
+                    <p style="font-style: italic;">"The Federal Reserve interest rate affects mortgage rates because..."</p>
+                    <p style="font-style: italic;">"Credit risk assessment considers factors including..."</p>
+                </div>
+                <div class="architecture-diagram" style="flex-direction: row; justify-content: space-around;">
+                    <div class="component">📊 Tokenization<br/><small>Text → Numbers</small></div>
+                    <div class="component">🔄 Pattern Learning<br/><small>Statistical Relationships</small></div>
+                    <div class="component">⚙️ Parameter Updates<br/><small>Weight Adjustments</small></div>
+                    <div class="component">✅ Validation<br/><small>Performance Testing</small></div>
+                </div>
+                <div style="background: rgba(255, 215, 0, 0.2); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <h4 style="color: #FFD700;">Result:</h4>
+                    <p>Input: "When the Fed raises interest rates, mortgage rates typically..."</p>
+                    <p style="color: #87CEEB;">Output: "...increase because banks face higher borrowing costs"</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: AI Benefits -->
+        <div class="slide">
+            <h1>💰 AI Benefits for Financial Organizations</h1>
+            <div class="chart-container">
+                <canvas id="benefitsChart"></canvas>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">10-15%</span>
+                    <span class="stat-label">Developer Productivity Increase</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">72%</span>
+                    <span class="stat-label">Document Processing Time Reduction</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">25%</span>
+                    <span class="stat-label">Faster Incident Resolution</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">360K</span>
+                    <span class="stat-label">Work Hours Saved (JPMorgan)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Fears and Concerns -->
+        <div class="slide">
+            <h1>😰 Common AI Fears and Concerns</h1>
+            <div class="diagram-container">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div class="stat-card" style="background: linear-gradient(135deg, #FF6B6B, #ee5a52);">
+                        <h4>🤖 Job Replacement</h4>
+                        <p><strong>Reality:</strong> +78M new jobs by 2030</p>
+                        <p>Software developers rank 4th in growth</p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #FF9800, #F57C00);">
+                        <h4>🔒 Security Risks</h4>
+                        <p><strong>Reality:</strong> New frameworks available</p>
+                        <p>Zero-trust, encryption, federated learning</p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #4CAF50, #45a049);">
+                        <h4>🌱 Environmental Impact</h4>
+                        <p><strong>Reality:</strong> GPT-3: 1,287 MWh training</p>
+                        <p>Green AI: efficiency + renewable energy</p>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #9C27B0, #7B1FA2);">
+                        <h4>📋 Compliance Issues</h4>
+                        <p><strong>Reality:</strong> Clear guidance available</p>
+                        <p>FINRA Notice 24-09, XAI (Explainable AI) frameworks</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: SCIPAB Overview -->
+        <div class="slide">
+            <h1>📋 SCIPAB Framework Overview</h1>
+            <div class="diagram-container">
+                <div class="scipab-framework">
+                    <div class="scipab-item">
+                        <span class="scipab-letter">S</span>
+                        <strong>Situation:</strong> Current business context and challenges
+                    </div>
+                    <div class="scipab-item">
+                        <span class="scipab-letter">C</span>
+                        <strong>Complication:</strong> Problems and obstacles preventing success
+                    </div>
+                    <div class="scipab-item">
+                        <span class="scipab-letter">I</span>
+                        <strong>Implication:</strong> Consequences of inaction or current approach
+                    </div>
+                    <div class="scipab-item">
+                        <span class="scipab-letter">P</span>
+                        <strong>Position:</strong> Recommended strategic approach and solution
+                    </div>
+                    <div class="scipab-item">
+                        <span class="scipab-letter">A</span>
+                        <strong>Action:</strong> Specific steps and implementation plan
+                    </div>
+                    <div class="scipab-item">
+                        <span class="scipab-letter">B</span>
+                        <strong>Benefit:</strong> Expected outcomes and value creation
+                    </div>
+                </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <p style="color: #87CEEB; font-size: 1.1em;">A structured approach for building compelling AI business cases in financial organizations</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: SCIPAB - Situation -->
+        <div class="slide">
+            <h1>📊 SCIPAB - Situation: Our Current Position</h1>
+            <div class="diagram-container">
+                <div class="two-column">
+                    <div>
+                        <h3>Our Organization Today</h3>
+                        <div class="info-box">
+                            <h4>We Want to Implement AI</h4>
+                            <p>Our financial company recognizes AI's potential to improve operations, reduce costs, and enhance customer service</p>
+                        </div>
+                        <h4>Business Drivers:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>💰 Cost reduction opportunities in manual processes</li>
+                                <li>⚡ Faster customer service and decision-making</li>
+                                <li>📊 Better insights from our vast data repositories</li>
+                                <li>🏆 Competitive advantage through innovation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Our Core Concerns</h3>
+                        <div class="warning-box">
+                            <h4>🔒 Data Confidentiality Risks</h4>
+                            <p>Customer financial data, trading information, and proprietary algorithms require maximum protection</p>
+                        </div>
+                        <div class="warning-box">
+                            <h4>⚖️ Regulatory Compliance</h4>
+                            <p>FINRA, SEC, GDPR, and banking regulations create complex compliance requirements for AI systems</p>
+                        </div>
+                        <div class="example-box">
+                            <p><strong>Bottom Line:</strong> We need AI benefits without compromising security or regulatory standing</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: SCIPAB - Complication -->
+        <div class="slide">
+            <h1>⚠️ SCIPAB - Complication: What's Stopping Us</h1>
+            <div class="diagram-container">
+                <div class="two-column">
+                    <div>
+                        <h3>🔒 Data Confidentiality Barriers</h3>
+                        <div class="warning-box">
+                            <h4>Customer Data Exposure Risk</h4>
+                            <p>AI systems often require large datasets, potentially exposing sensitive customer financial information</p>
+                        </div>
+                        <h4>Specific Concerns:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>💳 Customer PII (Personally Identifiable Information) in training data</li>
+                                <li>📊 Proprietary trading algorithms and market data</li>
+                                <li>🏦 Internal financial metrics and performance data</li>
+                                <li>☁️ Third-party AI vendor access to our systems</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>⚖️ Regulatory Compliance Obstacles</h3>
+                        <div class="warning-box">
+                            <h4>Unclear AI Governance Requirements</h4>
+                            <p>Existing regulations weren't designed for AI, creating uncertainty about compliance standards</p>
+                        </div>
+                        <h4>Key Challenges:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>📋 FINRA Notice 24-09: AI model validation requirements</li>
+                                <li>🔍 Explainability requirements for AI decisions</li>
+                                <li>📊 Model risk management and ongoing monitoring</li>
+                                <li>⚖️ Potential liability for AI-driven decisions</li>
+                            </ul>
+                        </div>
+                        <div class="example-box">
+                            <h4>The Result</h4>
+                            <p>We're paralyzed by risk concerns while competitors move ahead with AI implementation</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: SCIPAB - Implication -->
+        <div class="slide">
+            <h1>🚨 SCIPAB - Implication: Cost of Inaction</h1>
+            <div class="diagram-container">
+                <div class="two-column">
+                    <div>
+                        <h3>🏆 Competitive Disadvantage</h3>
+                        <div class="warning-box">
+                            <h4>While We Wait, Others Move Forward</h4>
+                            <p>Competitors implementing AI-first strategies are gaining significant operational advantages</p>
+                        </div>
+                        <h4>Market Reality:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>📈 AI-enabled firms: 1.5x higher revenue growth</li>
+                                <li>⚡ 30-40% faster customer service response times</li>
+                                <li>💰 25% lower operational costs than traditional firms</li>
+                                <li>🎯 Better risk detection and fraud prevention</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>📉 Business Risks We Face</h3>
+                        <div class="warning-box">
+                            <h4>The Innovation Gap Widens</h4>
+                            <p>Delaying AI adoption due to concerns may result in permanent competitive disadvantage</p>
+                        </div>
+                        <h4>Potential Consequences:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>👥 Loss of tech talent to AI-forward companies</li>
+                                <li>📊 Continued high manual processing costs</li>
+                                <li>🐌 Slower decision-making than competitors</li>
+                                <li>🔍 Missed opportunities for better risk management</li>
+                            </ul>
+                        </div>
+                        <div class="example-box">
+                            <h4>Key Insight</h4>
+                            <p>Security and compliance concerns are solvable - the real risk is being left behind while we perfect our approach</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: SCIPAB - Position -->
+        <div class="slide">
+            <h1>🎯 SCIPAB - Position: Secure AI Implementation</h1>
+            <div class="diagram-container">
+                <div class="two-column">
+                    <div>
+                        <h3>🛡️ Security-First AI Strategy</h3>
+                        <div class="info-box">
+                            <h4>Our Recommended Approach</h4>
+                            <p>Implement AI using privacy-preserving techniques and robust governance that meets our regulatory requirements</p>
+                        </div>
+                        <h4>Core Security Principles:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>🔒 Data never leaves our secure environment</li>
+                                <li>🎭 Use synthetic data for AI training and testing</li>
+                                <li>🔐 On-premises deployment with private cloud options</li>
+                                <li>🛡️ Federated learning for model training without data sharing</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>⚖️ Compliance-Ready Implementation</h3>
+                        <div class="example-box">
+                            <h4>📋 Regulatory Alignment Strategy</h4>
+                            <p>Start with use cases that have clear regulatory guidance and build governance framework from day one</p>
+                        </div>
+                        <h4>Compliance Framework:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>✅ Model explainability and audit trails</li>
+                                <li>📊 Continuous monitoring and validation</li>
+                                <li>📋 Documentation meeting FINRA requirements</li>
+                                <li>🔍 Regular model performance and bias testing</li>
+                            </ul>
+                        </div>
+                        <div class="info-box">
+                            <h4>Start Small, Scale Securely</h4>
+                            <p>Begin with internal productivity tools, then expand to customer-facing applications with proven security</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: SCIPAB - Action Plan -->
+        <div class="slide">
+            <h1>🚀 SCIPAB - Action: Secure Implementation Steps</h1>
+            <div class="diagram-container">
+                <div class="two-column">
+                    <div>
+                        <h3>🛡️ Phase 1: Security Foundation (30 Days)</h3>
+                        <div class="info-box">
+                            <h4>Establish Security-First Governance</h4>
+                            <p>Build the governance and security framework before any AI deployment</p>
+                        </div>
+                        <h4>Immediate Actions:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>📋 Create AI security and governance committee</li>
+                                <li>🔒 Establish data classification and access controls</li>
+                                <li>⚖️ Review regulatory requirements with legal team</li>
+                                <li>🔍 Assess current infrastructure for secure AI deployment</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>🚀 Phase 2: Secure Pilot (60 Days)</h3>
+                        <div class="example-box">
+                            <h4>🎯 Low-Risk AI Pilots</h4>
+                            <p>Start with internal productivity tools using synthetic or anonymized data</p>
+                        </div>
+                        <h4>Safe First Use Cases:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>💻 AI coding assistants for developers (no customer data)</li>
+                                <li>📋 Document summarization for internal reports</li>
+                                <li>🔍 Regulatory research and compliance document analysis</li>
+                                <li>📊 Synthetic data generation for testing environments</li>
+                            </ul>
+                        </div>
+                        <div class="warning-box">
+                            <h4>Success Criteria</h4>
+                            <p>Demonstrate AI value while maintaining zero data breaches and full regulatory compliance</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: SCIPAB - Benefits -->
+        <div class="slide">
+            <h1>💎 SCIPAB - Benefits: Secure AI Success</h1>
+            <div class="diagram-container">
+                <div class="two-column">
+                    <div>
+                        <h3>🛡️ Security & Compliance Benefits</h3>
+                        <div class="example-box">
+                            <h4>🔒 Enhanced Security Posture</h4>
+                            <p><strong>Secure by Design:</strong> AI implementation strengthens overall security architecture</p>
+                            <p><strong>Compliance Advantage:</strong> Better regulatory reporting and monitoring</p>
+                        </div>
+                        <h4>Risk Management Improvements:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>🔍 95% improvement in fraud detection accuracy</li>
+                                <li>📋 Automated compliance monitoring and reporting</li>
+                                <li>⚖️ Reduced regulatory examination risks</li>
+                                <li>🛡️ Better cybersecurity threat detection</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>💰 Business Value Delivery</h3>
+                        <div class="info-box">
+                            <h4>🎯 Measurable ROI with Security</h4>
+                            <p>Achieve competitive AI benefits while maintaining the highest security and compliance standards</p>
+                        </div>
+                        <h4>Expected Outcomes:</h4>
+                        <div class="content-list">
+                            <ul>
+                                <li>⚡ 25% faster internal processes without data exposure</li>
+                                <li>💸 15-20% operational cost reduction</li>
+                                <li>👥 Higher employee satisfaction with AI-assisted work</li>
+                                <li>🏆 Industry leadership in secure AI implementation</li>
+                            </ul>
+                        </div>
+                        <div class="example-box">
+                            <h4>🎓 Strategic Advantage</h4>
+                            <p>Become the model for how financial institutions can safely implement AI while maintaining regulatory excellence</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 24: Career Action Plan -->
+        <div class="slide">
+            <h1>🚀 Career Development Action Plan</h1>
+            <div class="diagram-container">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div class="phase">
+                        <h4>⚡ 90-Day Quick Start</h4>
+                        <ul style="text-align: left;">
+                            <li>Week 1-2: AI fundamentals assessment</li>
+                            <li>Week 3-4: Hands-on AI tools</li>
+                            <li>Week 5-8: Join AI communities</li>
+                            <li>Week 9-12: First certification</li>
+                        </ul>
+                    </div>
+                    <div class="phase">
+                        <h4>🎯 6-Month Milestones</h4>
+                        <ul style="text-align: left;">
+                            <li>2-3 foundational certifications</li>
+                            <li>Lead AI pilot project</li>
+                            <li>Establish AI network</li>
+                            <li>Demonstrate AI integration</li>
+                        </ul>
+                    </div>
+                    <div class="phase">
+                        <h4>🏆 12-Month Goals</h4>
+                        <ul style="text-align: left;">
+                            <li>Advanced specialization</li>
+                            <li>Mentor colleagues</li>
+                            <li>Industry recognition</li>
+                            <li>AI-focused role transition</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 26: Closing Thoughts -->
+        <div class="slide">
+            <h1>🌟 Embracing the AI Future</h1>
+            <div class="diagram-container">
+                <div style="font-size: 4em; margin: 20px 0;">🚀🤖💡</div>
+                <h2 style="color: #4CAF50; margin-bottom: 20px;">The AI Revolution Has Begun</h2>
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; margin: 20px 0;">
+                    <p style="font-size: 1.1em; font-style: italic; color: #FFD700; text-align: center;">
+                        "The future of AI is not about replacing human intelligence, but about augmenting it in ways that make us all more capable of solving the complex challenges that define our time."
+                    </p>
+                    <p style="text-align: center; margin-top: 15px; color: #87CEEB;">
+                        - Geoffrey Hinton, AI Pioneer
+                    </p>
+                </div>
+                <h3 style="color: #FF6B6B; margin-top: 25px;">The Question Now Is: Will You Help Lead It?</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" onclick="changeSlide(-1)">◀ Previous</button>
+        <button class="nav-btn" onclick="changeSlide(1)">Next ▶</button>
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides[currentSlideIndex].classList.remove('active');
+            currentSlideIndex = (n + slides.length) % slides.length;
+            slides[currentSlideIndex].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlideIndex + 1;
+            
+            // Initialize charts when slides become active
+            setTimeout(() => {
+                initializeChartsForCurrentSlide();
+            }, 100);
+        }
+
+        function changeSlide(n) {
+            showSlide(currentSlideIndex + n);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        function initializeChartsForCurrentSlide() {
+            const currentSlide = slides[currentSlideIndex];
+            
+            // AI Adoption Chart
+            if (currentSlide.querySelector('#adoptionChart')) {
+                const ctx = document.getElementById('adoptionChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
+                        datasets: [{
+                            label: 'AI Adoption in Financial Services (%)',
+                            data: [25, 35, 48, 62, 78, 85],
+                            borderColor: '#4CAF50',
+                            backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: 'white' } }
+                        },
+                        scales: {
+                            x: { ticks: { color: 'white' } },
+                            y: { ticks: { color: 'white' } }
+                        }
+                    }
+                });
+            }
+
+            // AI Types Chart
+            if (currentSlide.querySelector('#aiTypesChart')) {
+                const ctx = document.getElementById('aiTypesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['ANI (Current)', 'GenAI (Strategic)', 'AGI (Future)'],
+                        datasets: [{
+                            data: [70, 25, 5],
+                            backgroundColor: ['#4CAF50', '#9C27B0', '#FF9800']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: 'white' } }
+                        }
+                    }
+                });
+            }
+
+            // Benefits Chart
+            if (currentSlide.querySelector('#benefitsChart')) {
+                const ctx = document.getElementById('benefitsChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Productivity', 'Cost Reduction', 'Speed', 'Accuracy'],
+                        datasets: [{
+                            label: 'Improvement (%)',
+                            data: [15, 72, 25, 30],
+                            backgroundColor: ['#4CAF50', '#FF9800', '#9C27B0', '#F44336']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: 'white' } }
+                        },
+                        scales: {
+                            x: { ticks: { color: 'white' } },
+                            y: { ticks: { color: 'white' } }
+                        }
+                    }
+                });
+            }
+
+            // Job Impact Chart
+            if (currentSlide.querySelector('#jobImpactChart')) {
+                const ctx = document.getElementById('jobImpactChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jobs Created', 'Jobs Displaced', 'Net Change'],
+                        datasets: [{
+                            label: 'Jobs (Millions)',
+                            data: [170, -92, 78],
+                            backgroundColor: ['#4CAF50', '#F44336', '#FFD700']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: 'white' } }
+                        },
+                        scales: {
+                            x: { ticks: { color: 'white' } },
+                            y: { ticks: { color: 'white' } }
+                        }
+                    }
+                });
+            }
+
+            // Training Chart
+            if (currentSlide.querySelector('#trainingChart')) {
+                const ctx = document.getElementById('trainingChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Technical Skills', 'Business Acumen', 'Communication', 'Ethics', 'Leadership'],
+                        datasets: [{
+                            label: 'Current Importance',
+                            data: [8, 6, 7, 5, 6],
+                            backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                            borderColor: '#4CAF50'
+                        }, {
+                            label: 'AI Era Importance',
+                            data: [9, 9, 9, 9, 8],
+                            backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                            borderColor: '#FFD700'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: 'white' } }
+                        },
+                        scales: {
+                            r: { 
+                                ticks: { color: 'white', backdropColor: 'rgba(0,0,0,0)' },
+                                pointLabels: { color: 'white' },
+                                grid: { color: 'rgba(255,255,255,0.2)' },
+                                angleLines: { color: 'rgba(255,255,255,0.2)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ROI Chart
+            if (currentSlide.querySelector('#roiChart')) {
+                const ctx = document.getElementById('roiChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Month 3', 'Month 6', 'Month 12', 'Month 18', 'Month 24'],
+                        datasets: [{
+                            label: 'ROI Multiplier',
+                            data: [0.5, 1.2, 2.8, 3.9, 4.2],
+                            borderColor: '#FFD700',
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: 'white' } }
+                        },
+                        scales: {
+                            x: { ticks: { color: 'white' } },
+                            y: { ticks: { color: 'white' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize first slide
+        initializeChartsForCurrentSlide();
+    </script>
+</body>
+</html>
